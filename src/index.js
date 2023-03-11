@@ -10,6 +10,9 @@ const refs = {
 
 const KEY = '34209652-437fd061aa0754a74419b4413';
 const URL = 'https://pixabay.com/api/';
+const IMAGETYPE = 'photo';
+const orientation = 'horizontal';
+const safesearch = 'true';
 
 function onSearch(e) {
   e.preventDefault();
@@ -24,7 +27,9 @@ refs.form.addEventListener('submit', onSearch);
 
 function fetchQuery(query) {
   axios
-    .get(`${URL}?key=${KEY}&q=${query}&image_type=photo`)
+    .get(
+      `${URL}?key=${KEY}&q=${query}&image_type=${IMAGETYPE}&orientation=${orientation}&safesearch=${safesearch}`
+    )
     .then(response => {
       if (response.status !== 200) {
         throw new Error(response.status);
