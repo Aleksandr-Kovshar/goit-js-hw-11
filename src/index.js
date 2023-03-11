@@ -5,7 +5,7 @@ const refs = {
   form: document.querySelector('.search-form'),
   inputSearch: document.querySelector('#inputSearch'),
   btnSearch: document.querySelector('.btnSeach'),
-  picturesList: document.querySelector('.pictures-list'),
+  gallery: document.querySelector('.gallery'),
 };
 
 const KEY = '34209652-437fd061aa0754a74419b4413';
@@ -42,10 +42,24 @@ function fetchQuery(query) {
 function renderPictures(pic) {
   const list = pic
     .map(onePic => {
-      return `<li class="pictures-list__item">
-           <img class = "image" src="${onePic.previewURL}" alt="" >
-           </li>`;
+      return `<div class="photo-card">
+  <img src="${onePic.webformatURL}" alt="${onePic.tags}" loading="lazy" />
+  <div class="info">
+    <p class="info-item">
+      <b>Likes ${onePic.likes}</b>
+    </p>
+    <p class="info-item">
+      <b>Views ${onePic.views}</b>
+    </p>
+    <p class="info-item">
+      <b>Comments ${onePic.comments}</b>
+    </p>
+    <p class="info-item">
+      <b>Downloads ${onePic.downloads}</b>
+    </p>
+  </div>
+</div>`;
     })
     .join('');
-  refs.picturesList.innerHTML = list;
+  refs.gallery.innerHTML = list;
 }
