@@ -6,6 +6,7 @@ const refs = {
   inputSearch: document.querySelector('#inputSearch'),
   btnSearch: document.querySelector('.btnSeach'),
   gallery: document.querySelector('.gallery'),
+  loadMore: document.querySelector('.load-more'),
 };
 
 const KEY = '34209652-437fd061aa0754a74419b4413';
@@ -13,13 +14,25 @@ const URL = 'https://pixabay.com/api/';
 const IMAGETYPE = 'photo';
 const orientation = 'horizontal';
 const safesearch = 'true';
+const PER_PAGE = 4;
+let page = 1;
+let query = '';
+let pages = 1;
+let pics = [];
 
 function onSearch(e) {
   e.preventDefault();
-  const query = refs.inputSearch.value;
 
+  if (query === refs.inputSearch.value || !refs.inputSearch.value) {
+    return;
+  }
+  if (query !== refs.inputSearch.value) {
+    refs.gallery.innerHTML = '';
+  }
+
+  query = refs.inputSearch.value;
   console.log(query);
-
+  page = 1;
   fetchQuery(query);
 }
 
@@ -28,7 +41,7 @@ refs.form.addEventListener('submit', onSearch);
 function fetchQuery(query) {
   axios
     .get(
-      `${URL}?key=${KEY}&q=${query}&image_type=${IMAGETYPE}&orientation=${orientation}&safesearch=${safesearch}`
+      `${URL}?key=${KEY}&per_page=${PER_PAGE}&page=${page}&q=${query}&image_type=${IMAGETYPE}&orientation=${orientation}&safesearch=${safesearch}`
     )
     .then(response => {
       if (response.status !== 200) {
@@ -66,5 +79,24 @@ function renderPictures(pic) {
 </div>`;
     })
     .join('');
-  refs.gallery.innerHTML = list;
+  if (!page) {
+    refs.gallery.innerHTML = '';
+  }
+
+  refs.gallery.insertAdjacentHTML('beforeend', list);
 }
+
+function onSearchMore(e) {
+  e.preventDefault();
+
+  query = refs.inputSearch.value;
+  console.log(query);
+  fetchQuery(query);
+}
+
+const handleLoadMore = e => {
+  page++;
+  onSearchMore(e);
+};
+
+refs.loadMore.addEventListener('click', handleLoadMore);
