@@ -14,11 +14,12 @@ const URL = 'https://pixabay.com/api/';
 const IMAGETYPE = 'photo';
 const orientation = 'horizontal';
 const safesearch = 'true';
-const PER_PAGE = 4;
+const PER_PAGE = 50;
 let page = 1;
 let query = '';
 let pages = 1;
 let pics = [];
+let totalHits = 0;
 
 function onSearch(e) {
   e.preventDefault();
@@ -51,7 +52,20 @@ function fetchQuery(query) {
       console.log(response);
       console.log(response.data.hits);
       const pictures = response.data.hits;
-      return pictures;
+      pics = pictures;
+      totalHits = response.data.totalHits;
+      console.log(totalHits);
+      pages = Math.ceil(totalHits / PER_PAGE);
+      console.log(pages);
+
+      if (totalHits !== 0) {
+        loadMoreVisible();
+      } else {
+        Notify.failure(
+          'Sorry, there are no images matching your search query. Please try again.'
+        );
+      }
+      return pics;
     })
     .then(renderPictures)
     .catch(error => console.log(error.message));
@@ -82,7 +96,6 @@ function renderPictures(pic) {
   if (!page) {
     refs.gallery.innerHTML = '';
   }
-
   refs.gallery.insertAdjacentHTML('beforeend', list);
 }
 
@@ -95,8 +108,29 @@ function onSearchMore(e) {
 }
 
 const handleLoadMore = e => {
+  if (query !== refs.inputSearch.value || !refs.inputSearch.value) {
+    return;
+  }
   page++;
-  onSearchMore(e);
+  if (pages === page) {
+    loadMoreInactive();
+    Notify.failure(
+      "We're sorry, but you've reached the end of search results."
+    );
+  } else onSearchMore(e);
 };
 
 refs.loadMore.addEventListener('click', handleLoadMore);
+
+// У відповіді бекенд повертає властивість totalHits - загальна кількість зображень, які відповідають критерію пошуку(для безкоштовного акаунту).
+// Якщо користувач дійшов до кінця колекції, ховай кнопку і виводь повідомлення з текстом
+// "We're sorry, but you've reached the end of search results.".
+
+// Використовується синтаксис async/await.
+
+const loadMoreVisible = () => {
+  refs.loadMore.classList.remove('inactive');
+};
+const loadMoreInactive = () => {
+  refs.loadMore.classList.add('inactive');
+};
