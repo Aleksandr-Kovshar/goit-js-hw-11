@@ -39,46 +39,85 @@ function onSearch(e) {
 
 refs.form.addEventListener('submit', onSearch);
 
-function fetchQuery(query) {
-  axios
-    .get(
+async function fetchQuery(query) {
+  try {
+    const response = await axios.get(
       `${URL}?key=${KEY}&per_page=${PER_PAGE}&page=${page}&q=${query}&image_type=${IMAGETYPE}&orientation=${orientation}&safesearch=${safesearch}`
-    )
-    .then(response => {
-      if (response.status !== 200) {
-        throw new Error(response.status);
-      }
-
-      console.log(response);
-      console.log(response.data.hits);
-      const pictures = response.data.hits;
-      pics = pictures;
-      totalHits = response.data.totalHits;
-      console.log(`totalHits: ${totalHits}`);
-      pages = Math.ceil(totalHits / PER_PAGE);
-      console.log(`pages: ${pages}`);
-      console.log(`page: ${page}`);
-      if ((page === 1) & (totalHits !== 0)) {
-        Notify.success(`Hooray! We found ${totalHits} images.`);
-      }
-      if (totalHits !== 0) {
-        if ((pages > 1) & (pages !== page)) {
-          loadMoreVisible();
-        } else {
-          loadMoreInactive();
-        }
+    );
+    if (response.status !== 200) {
+      throw new Error(response.status);
+    }
+    console.log(response);
+    console.log(response.data.hits);
+    const pictures = response.data.hits;
+    pics = pictures;
+    totalHits = response.data.totalHits;
+    console.log(`totalHits: ${totalHits}`);
+    pages = Math.ceil(totalHits / PER_PAGE);
+    console.log(`pages: ${pages}`);
+    console.log(`page: ${page}`);
+    if ((page === 1) & (totalHits !== 0)) {
+      Notify.success(`Hooray! We found ${totalHits} images.`);
+    }
+    if (totalHits !== 0) {
+      if ((pages > 1) & (pages !== page)) {
+        loadMoreVisible();
       } else {
         loadMoreInactive();
-        Notify.failure(
-          'Sorry, there are no images matching your search query. Please try again.'
-        );
       }
+    } else {
+      loadMoreInactive();
+      Notify.failure(
+        'Sorry, there are no images matching your search query. Please try again.'
+      );
+    }
 
-      return pics;
-    })
-    .then(renderPictures)
-    .catch(error => console.log(error.message));
+    await renderPictures(pics);
+  } catch (error) {
+    console.log(error.message);
+  }
 }
+
+// function fetchQuery(query) {
+//   axios
+//     .get(
+//       `${URL}?key=${KEY}&per_page=${PER_PAGE}&page=${page}&q=${query}&image_type=${IMAGETYPE}&orientation=${orientation}&safesearch=${safesearch}`
+//     )
+//     .then(response => {
+//       if (response.status !== 200) {
+//         throw new Error(response.status);
+//       }
+
+//       console.log(response);
+//       console.log(response.data.hits);
+//       const pictures = response.data.hits;
+//       pics = pictures;
+//       totalHits = response.data.totalHits;
+//       console.log(`totalHits: ${totalHits}`);
+//       pages = Math.ceil(totalHits / PER_PAGE);
+//       console.log(`pages: ${pages}`);
+//       console.log(`page: ${page}`);
+//       if ((page === 1) & (totalHits !== 0)) {
+//         Notify.success(`Hooray! We found ${totalHits} images.`);
+//       }
+//       if (totalHits !== 0) {
+//         if ((pages > 1) & (pages !== page)) {
+//           loadMoreVisible();
+//         } else {
+//           loadMoreInactive();
+//         }
+//       } else {
+//         loadMoreInactive();
+//         Notify.failure(
+//           'Sorry, there are no images matching your search query. Please try again.'
+//         );
+//       }
+
+//       return pics;
+//     })
+//     .then(renderPictures)
+//     .catch(error => console.log(error.message));
+// }
 
 function renderPictures(pic) {
   const list = pic
