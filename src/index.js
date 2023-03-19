@@ -1,5 +1,7 @@
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import axios from 'axios';
+import SimpleLightbox from 'simplelightbox';
+import 'simplelightbox/dist/simple-lightbox.min.css';
 
 const refs = {
   form: document.querySelector('.search-form'),
@@ -119,11 +121,41 @@ async function fetchQuery(query) {
 //     .catch(error => console.log(error.message));
 // }
 
+// function renderPictures(pic) {
+//   const list = pic
+//     .map(onePic => {
+//       return `<div class="photo-card">
+//   <img src="${onePic.webformatURL}" alt="${onePic.tags}" loading="lazy" />
+//   <div class="info">
+//     <p class="info-item">
+//       <b>Likes ${onePic.likes}</b>
+//     </p>
+//     <p class="info-item">
+//       <b>Views ${onePic.views}</b>
+//     </p>
+//     <p class="info-item">
+//       <b>Comments ${onePic.comments}</b>
+//     </p>
+//     <p class="info-item">
+//       <b>Downloads ${onePic.downloads}</b>
+//     </p>
+//   </div>
+// </div>`;
+//     })
+//     .join('');
+//   if (!page) {
+//     refs.gallery.innerHTML = '';
+//   }
+//   refs.gallery.insertAdjacentHTML('beforeend', list);
+// }
+
 function renderPictures(pic) {
   const list = pic
     .map(onePic => {
       return `<div class="photo-card">
-  <img src="${onePic.webformatURL}" alt="${onePic.tags}" loading="lazy" />
+  <a class="photolink" href="${onePic.largeImageURL}">
+        <img src="${onePic.previewURL}" alt="${onePic.tags} ; <br> Likes ${onePic.likes}, Views ${onePic.views}, Comments ${onePic.comments}, Downloads ${onePic.downloads}" loading="lazy" />
+      </a>
   <div class="info">
     <p class="info-item">
       <b>Likes ${onePic.likes}</b>
@@ -145,6 +177,7 @@ function renderPictures(pic) {
     refs.gallery.innerHTML = '';
   }
   refs.gallery.insertAdjacentHTML('beforeend', list);
+  lightbox.refresh();
 }
 
 function onSearchMore(e) {
@@ -174,3 +207,9 @@ const loadMoreVisible = () => {
 const loadMoreInactive = () => {
   refs.loadMore.classList.add('inactive');
 };
+
+const lightbox = new SimpleLightbox('.gallery a', {
+  captions: true,
+  captionsData: 'alt',
+  captionDelay: 250,
+});
