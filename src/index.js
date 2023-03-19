@@ -14,7 +14,7 @@ const URL = 'https://pixabay.com/api/';
 const IMAGETYPE = 'photo';
 const orientation = 'horizontal';
 const safesearch = 'true';
-const PER_PAGE = 50;
+const PER_PAGE = 40;
 let page = 1;
 let query = '';
 let pages = 1;
@@ -54,17 +54,25 @@ function fetchQuery(query) {
       const pictures = response.data.hits;
       pics = pictures;
       totalHits = response.data.totalHits;
-      console.log(totalHits);
+      console.log(`totalHits: ${totalHits}`);
       pages = Math.ceil(totalHits / PER_PAGE);
-      console.log(pages);
-
+      console.log(`pages: ${pages}`);
+      console.log(`page: ${page}`);
+      if (page === 1) {
+        Notify.success(`Hooray! We found ${totalHits} images.`);
+      }
       if (totalHits !== 0) {
-        loadMoreVisible();
+        if ((pages > 1) & (pages !== page)) {
+          loadMoreVisible();
+        } else {
+          loadMoreInactive();
+        }
       } else {
         Notify.failure(
           'Sorry, there are no images matching your search query. Please try again.'
         );
       }
+
       return pics;
     })
     .then(renderPictures)
@@ -112,21 +120,13 @@ const handleLoadMore = e => {
     return;
   }
   page++;
+  onSearchMore(e);
   if (pages === page) {
-    loadMoreInactive();
-    Notify.failure(
-      "We're sorry, but you've reached the end of search results."
-    );
-  } else onSearchMore(e);
+    Notify.info("We're sorry, but you've reached the end of search results.");
+  }
 };
 
 refs.loadMore.addEventListener('click', handleLoadMore);
-
-// У відповіді бекенд повертає властивість totalHits - загальна кількість зображень, які відповідають критерію пошуку(для безкоштовного акаунту).
-// Якщо користувач дійшов до кінця колекції, ховай кнопку і виводь повідомлення з текстом
-// "We're sorry, but you've reached the end of search results.".
-
-// Використовується синтаксис async/await.
 
 const loadMoreVisible = () => {
   refs.loadMore.classList.remove('inactive');
