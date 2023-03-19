@@ -58,16 +58,16 @@ function fetchQuery(query) {
       pages = Math.ceil(totalHits / PER_PAGE);
       console.log(`pages: ${pages}`);
       console.log(`page: ${page}`);
-      if (page === 1) {
-        Notify.success(`Hooray! We found ${totalHits} images.`);
-      }
+
       if (totalHits !== 0) {
         if ((pages > 1) & (pages !== page)) {
           loadMoreVisible();
         } else {
           loadMoreInactive();
         }
+        Notify.success(`Hooray! We found ${totalHits} images.`);
       } else {
+        loadMoreInactive();
         Notify.failure(
           'Sorry, there are no images matching your search query. Please try again.'
         );
